@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
-    public class ProductManager:IProductService
+    public class ProductManager : IProductService
     {
         private readonly IProductDal _productDal;
 
@@ -33,9 +33,14 @@ namespace Business.Concrete
             return _productDal.GetAll();
         }
 
-        public List<Product> GetAllByCategory(int categoryId)
+        public List<Product> GetAllByCategoryId(int categoryId)
         {
-           return _productDal.GetAllByCategory(categoryId);
+            return _productDal.GetAll(x => x.CategoryId == categoryId);
+        }
+
+        public List<Product> GetByUnitPrice(decimal min, decimal max)
+        {
+            return _productDal.GetAll(x => x.UnitPrice >= min && x.UnitPrice <= max);
         }
 
         public void Update(Product product)
