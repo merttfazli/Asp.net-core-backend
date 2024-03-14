@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Concrete.InMemory
 {
-    public class InMemoryProductDal : IProductDal
+    public class InMemoryProductDal 
     {
         List<Product> _products;
         public InMemoryProductDal()

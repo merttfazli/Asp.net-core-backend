@@ -1,6 +1,7 @@
 ﻿using Core.DataAccess;
+using Core.DataAccess.EntityFramework;
+using DataAccess.Concrete.EntityFramework;
 using Entitites.Concrete;
-using Entitites.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Abstract
 {
-    public interface IProductDal:IEntityRepository<Product>
+    public interface IOrderDal:IEntityRepository<Order>
     {
-        List<ProductDetailDto> GetProductDetails();
     }
 }
