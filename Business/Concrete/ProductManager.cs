@@ -23,7 +23,7 @@ namespace Business.Concrete
 
         public IResult Add(Product product)
         {
-            if (product.ProductName.Length<2)
+            if (product.ProductName.Length < 2)
                 return new ErrorResult(Messages.ProductNameInvalid);
 
             _productDal.Add(product);
@@ -33,38 +33,59 @@ namespace Business.Concrete
         public IResult Delete(Product product)
         {
             _productDal.Delete(product);
-            return new SuccessResult();
+            return new SuccessResult(Messages.Deleted);
         }
 
         public IDataResult<List<Product>> GetAll()
         {
-            return _productDal.GetAll();
+            var result = _productDal.GetAll();
+            if (result.Any())
+            {
+                if (DateTime.Now.Hour == 22)
+                    return new ErrorDataResult<List<Product>>(Messages.DataNotFound);
+                return new SuccessDataResult<List<Product>>(result);
+            }
+            else
+                return new ErrorDataResult<List<Product>>(Messages.DataNotFound);
         }
 
         public IDataResult<List<Product>> GetAllByCategoryId(int categoryId)
         {
-            return _productDal.GetAll(x => x.CategoryId == categoryId);
+            var result = _productDal.GetAll(x => x.CategoryId == categoryId);
+            if (result.Any())
+                return new SuccessDataResult<List<Product>>(result);
+            else
+                return new ErrorDataResult<List<Product>>(Messages.DataNotFound);
         }
 
         public IDataResult<Product> GetById(int productId)
         {
-            return _productDal.Get(x=>x.ProductId== productId);
+            var result = _productDal.Get(x => x.ProductId == productId);
+            if (result != null)
+                return new SuccessDataResult<Product>(result);
+            return new ErrorDataResult<Product>(Messages.DataNotFound);
         }
 
         public IDataResult<List<Product>> GetByUnitPrice(decimal min, decimal max)
         {
-            return _productDal.GetAll(x => x.UnitPrice >= min && x.UnitPrice <= max);
+            var result = _productDal.GetAll(x => x.UnitPrice >= min && x.UnitPrice <= max);
+            if (result.Any())
+                return new SuccessDataResult<List<Product>>(result);
+            return new ErrorDataResult<List<Product>>(Messages.DataNotFound);
         }
 
         public IDataResult<List<ProductDetailDto>> GetProductDetailDtos()
         {
-            return _productDal.GetProductDetails();
+            var result = _productDal.GetProductDetails();
+            if (result.Any())
+                return new SuccessDataResult<List<ProductDetailDto>>(result);
+            return new ErrorDataResult<List<ProductDetailDto>>(Messages.DataNotFound);
         }
 
         public IResult Update(Product product)
         {
             _productDal.Update(product);
-            return new SuccessResult();
+            return new SuccessResult(Messages.Updated);
         }
     }
 }
