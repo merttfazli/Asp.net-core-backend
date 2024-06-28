@@ -1,23 +1,17 @@
 ﻿using Business.Abstract;
 using Business.BusinessAspects;
-using Business.CCS;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspect.Autofac.Caching;
+using Core.Aspect.Autofac.Performance;
+using Core.Aspect.Autofac.Transaction;
 using Core.Aspect.Autofac.Validation;
-using Core.CrossCuttingConcers.Validation;
 using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entitites.Concrete;
 using Entitites.DTOs;
-using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ValidationException = FluentValidation.ValidationException;
+using System.Transactions;
 
 namespace Business.Concrete
 {
@@ -25,6 +19,7 @@ namespace Business.Concrete
     {
         private readonly IProductDal _productDal;
         private readonly ICategoryService _categoryService;
+
         public ProductManager(IProductDal productDal, ICategoryService categoryService)
         {
             _productDal = productDal;
@@ -33,6 +28,7 @@ namespace Business.Concrete
 
         [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
             IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName), CheckIfProductCountOfCategoryCorrect(product.CategoryId), CheckIfCurrentCategoryCountUpperThen15());
@@ -51,6 +47,7 @@ namespace Business.Concrete
             return new SuccessResult(Messages.Deleted);
         }
 
+        [CacheAspect] //key,value
         public IDataResult<List<Product>> GetAll()
         {
             var result = _productDal.GetAll();
@@ -73,6 +70,8 @@ namespace Business.Concrete
                 return new ErrorDataResult<List<Product>>(Messages.DataNotFound);
         }
 
+        [CacheAspect]
+        [PerformanceAspect(5)]//metodun çalışması 5 sn geçerse uyarı ver.
         public IDataResult<Product> GetById(int productId)
         {
             var result = _productDal.Get(x => x.ProductId == productId);
@@ -98,9 +97,9 @@ namespace Business.Concrete
         }
 
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Update(Product product)
         {
-
             if (CheckIfProductCountOfCategoryCorrect(product.CategoryId).Success)
             {
                 if (CheckIfProductNameExists(product.ProductName).Success)
@@ -137,6 +136,19 @@ namespace Business.Concrete
             if (data.Data.Count > 15)
                 return new ErrorResult(Messages.MaxCategoryCountReached);
             return new SuccessResult();
+        }
+
+        [TransactionScopeAspect]
+        public IResult AddTransactionalTest(Product product)
+        {
+            Add(product);
+            if (product.UnitPrice < 10)
+            {
+                throw new Exception("");
+            }
+            Add(product);
+
+            return null;
         }
     }
 }

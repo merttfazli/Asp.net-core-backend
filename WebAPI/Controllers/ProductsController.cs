@@ -1,6 +1,4 @@
 ﻿using Business.Abstract;
-using Business.Concrete;
-using DataAccess.Concrete.EntityFramework;
 using Entitites.Concrete;
 using Microsoft.AspNetCore.Mvc;
 

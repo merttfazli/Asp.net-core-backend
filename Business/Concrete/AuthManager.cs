@@ -5,11 +5,6 @@ using Core.Utilities.Results;
 using Core.Utilities.Security.Hashing;
 using Core.Utilities.Security.JWT;
 using Entitites.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
@@ -59,7 +54,8 @@ namespace Business.Concrete
 
         public IResult UserExists(string email)
         {
-            if (_userService.GetByMail(email) != null)
+            var mail = _userService.GetByMail(email);
+            if (mail.Data != null)
             {
                 return new ErrorResult(Messages.UserAlreadyExists);
             }

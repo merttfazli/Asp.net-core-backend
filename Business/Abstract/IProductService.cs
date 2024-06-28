@@ -1,11 +1,6 @@
 ﻿using Core.Utilities.Results;
 using Entitites.Concrete;
 using Entitites.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Abstract
 {
@@ -19,5 +14,6 @@ namespace Business.Abstract
         IResult Add(Product product);
         IResult Update(Product product);
         IResult Delete(Product product);
+        IResult AddTransactionalTest(Product product);
     }
 }
