@@ -1,11 +1,8 @@
 ﻿using Business.Abstract;
+using Business.Constants;
+using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entitites.Concrete;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
@@ -18,14 +15,22 @@ namespace Business.Concrete
             _categoryDal = categoryDal;
         }
 
-        public List<Category> GetAll()
+        public IDataResult<List<Category>> GetAll()
         {
-            return _categoryDal.GetAll();
+            var data = _categoryDal.GetAll();
+            if (data.Any())
+                return new SuccessDataResult<List<Category>>(data);
+            else
+                return new ErrorDataResult<List<Category>>(Messages.DataNotFound);
         }
 
-        public Category GetById(int categoryId)
+        public IDataResult<Category> GetById(int categoryId)
         {
-            return _categoryDal.Get(x => x.CategoryId == categoryId);
+            var data = _categoryDal.Get(x => x.CategoryId == categoryId);
+            if (data != null)
+                return new SuccessDataResult<Category>(data);
+            else
+                return new ErrorDataResult<Category>(Messages.DataNotFound);
         }
     }
 }
